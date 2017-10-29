@@ -2,11 +2,13 @@
 
 
 ParInt::ParInt(){
-  p=0;s=0;
+  p=0;
+  s=0;
 }
 
 ParInt::ParInt(int a,int b){
-  p=a;s=b;
+  p=a;
+  s=b;
 }
 
 int ParInt::primer(){
