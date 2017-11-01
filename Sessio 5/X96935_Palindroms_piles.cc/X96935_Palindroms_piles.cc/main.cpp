@@ -22,7 +22,8 @@ int main() {
     stack<int> pila;
     int s;
 
-    int sp = n/2;                       //meitat del palíndrom
+    //meitat del palíndrom
+    int sp = n/2;
     
     //entro la meitat a la pila
     for (int i = 0; i < sp; ++i) {
@@ -33,7 +34,8 @@ int main() {
     bool palindrom = true;
     int count = sp;
     
-    if (n%2 != 0) cin >> s;             //si imparell, no ens importa el del mig
+    //si imparell, no ens importa el del mig
+    if (n%2 != 0) cin >> s;
     
     while (palindrom and count != 0) {
         
