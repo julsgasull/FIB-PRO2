@@ -1,0 +1,52 @@
+Problema 2.1
+
+1  bool avaluar(Arbre<string> &a, const Variables &e) {
+2  string s = a.arrel();
+3  Arbre<string> a1, a2;
+4  a.fills(a1, a2);
+5  if (s == "not") return not avaluar(a1, e); 
+6  if (s == "or") return avaluar(a1, e) or avaluar(a2, e);  
+7  if (s == "and") return avaluar(a1, e) and avaluar(a2, e);
+8  if (s == "true") return true; 
+9  if (s == "false") return false;
+10 return e.valor(s);
+11 }
+
+Problema 2.2
+
+Aquest problema admet diferents respostes vàlides en funció de la implementació i del criteri usat per determinar quan l'arrel ja s'ha tractat. Entenent el tractament de l'arrel com el punt en què s'aplica l'operador lògic de l'arrel sobre el resultat d'avaluar un subarbre fill (o tots dos), les respostes podrien ser: 
+- A nivell conceptual (sense consideracions d'eficiència, sense tenir en compte l'avaluació en curtcircuit de les expressions booleanes,...), l'algorisme es basa en un esquema de recorregut en postordre perquè per poder avaluar les branques per "and" i "or" es necessari haver avaluat primer els subarbres fills (aquí veiem l'esquema de recorregut com l'esquema a seguir en el cas pitjor en una implementació eficient).
+- La implementació en C++ del problema 2.1 segueix un esquema d'inordre perquè l'avaluació en curtcircuit obliga a tenir en compte l'arrel quan aquesta és "or" o "and" després de la primera crida recursiva sobre el subarbre fill esquerre per decidir si cal continuar l'avaluació de l'expressió del subarbre fill dret. 
+Entenent el tractament de l'arrel com el punt on s'usa l'operador lògic de l'arrel per primer cop una resposta possible podria ser:
+- La implementació en C++ del problema 2.1 segueix un esquema de preordre perquè primer es consulta l'arrel abans de produir les crides recursives per decidir quin cas recursiu o quin cas recursiu cal aplicar (aquí assumim que només consultar l'arrel abans de calcular el resultat final és suficient per considerar que s'ha tractat l'arrel).
+
+Problema 2.3
+
+(una solució bastant complerta)
+
+La implementació del problema 2.1 té 3 casos directes (quan l'arrel no conté un operador) i 3 casos recursius (quan l'arrel conté un operador). Els casos directes apareixen després dels casos recursius en la solució. 
+
+Abans de tractar aquest casos l'algorisme, executa les instruccions de les línies 2-4.
+La precondició del mètode arrel (Línia 2) es compleix gràcies a la precondició d'avaluar.
+La precondició de fills (Línia 4), és a dir que a no sigui buit però a1 i a2 ho siguin, es compleix gracies a la pre d'avaluar i al fet que a1 i a2 s'acaben de declarar (Línia 4). Per tant, tot just abans d'executar la Línia 5, s conté l'arrel d'A i a1 i a2 en contenen el fill esquerre i el fill dret respectivament. 
+En aquest context, continuem amb la justificació dels casos directes i la justificació dels casos recursius. 
+
+Correctesa dels casos recursius. 
+
+En aplicació de la hipòtesi d'inducció (h.i.), suposem que les diferents crides a avaluar(a1, e) han retornat el resultat d'avaluar l'expressió booleana d'a1 en base als valors de les variables d'e. També suposem que les diferents crides a avaluar(a2, e) han retornat el resultat d'avaluar l'expressió booleana d'a2 en base als valors de les variables d'e.
+
+L'algorisme té tres casos recursius:
+a) L'arrel conté "not". Per satisfer la postcondició, el resultat d'avaluar l'expressió ha de ser el resultat de negar el resultat d'avaluar l'expressió del fill esquerre d'A gràcies a la Propietat 2, tal com fa el codi amb la crida a avaluar (Línia 5). Gràcies a la precondició d'avaluar sabem que l'arbre d'a1 també estarà ben format i per la Propietat 2 no serà buit, complint la precondició de la crida a avaluar, que donarà el resultat esperat gràcies a la h.i.  
+b) L'arrel conté "or" (Línia 6). Per satisfer la postcondició, el resultat d'avaluar l'expressió ha de ser el resultat d'aplicar l'operació or al resultat d'avaluar l'expressió del fill esquerre d'A i al de l'avaluació del fill dret. Gràcies a la precondició d'avaluar sabem que l'arbre d'a1 i el d'a2 també estaran ben formats i per la Propietat 1 no serà buit cap d'ells, complint la precondició del parell de crides a avaluar (Línia 6), que donaran el resultat esperat gracies a la h.i.  
+c) L'arrel conté "and" (Línia 7). La justificació és fàcil d'obtenir a partir de la del cas b).  
+
+Correctesa dels casos directes. 
+Els casos directes comencen a la línia 8. En aquest punt sabem que l'arrel d'A no conté un operador gràcies als casos tractats en línies anteriors. 
+Quan l'arrel no conté un operador i la Propietat 4 de l'enunciat ens garanteix que l'arbre "a" conté un sol node que és fulla d'A. Per tant la Propietat 3 implica que l'arrel d'A ha de ser una constant booleana o una variable booleana. 
+L'algorisme té tres casos directes:
+a) L'arrel és "true". Aleshores l'expressió és certa i cal retornar true per a satisfer la postcondició, tal com es fa. 
+b) L'arrel és "false". Aleshores l'expressió és falsa i cal retornar false per a satisfer la postcondició, tal com es fa. 
+c) L'arrel no es ni "true" ni "false". Aleshores l'expressió és una variable i cal retornar el seu valor segons el paràmetre e per satisfer la postcondició, tal com es fa. 
+La crida a e.valor(s) compleix la precondició del mètode gràcies a la precondició d'avaluar.  
+
+Acabament. L'algorisme acaba perquè la mida de l'arbre a és una funció fita. D'una banda, la mida d'un arbre és més gran o igual que zero. D'una altra banda, la mida de l'arbre "a" decreix sempre en cada crida recursiva (l'arbre subministrat en la crida recursiva s'ha obtingut amb el mètode fill i per tant ha perdut pel cap baix l'arrel A).
