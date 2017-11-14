@@ -439,12 +439,12 @@ Correctesa de Programes Iteratius i Programació Recursiva
 
 Correctesa de Programes Iteratius
 ---------------------------------
-###Principi d'inducció:
+### Principi d'inducció:
 P x significa que x compleix la propietat P.
 ![Inducció 1](https://github.com/julsgasull/PRO2/blob/master/Teoria/Imatges/induccio.png)
 ![Inducció 2](https://github.com/julsgasull/PRO2/blob/master/Teoria/Imatges/induccio2.png)
 
-###Correctesa de programes iteratius:
+### Correctesa de programes iteratius:
 ```cpp
 /* Pre */ inicialitzacions
 while (B) S
@@ -461,7 +461,7 @@ while (B) S
 > - Invariant -> t pertany a N (per assegurar-nos que si estem en la situació determinada per l’invariant, llavors t té un valor natural). 
 > - {Invariant i B i t = T}S{t < T} , per assegurar-nos que t decreix desprès de cada iteració.
 
-###Disseny inductiu d’algoritmes iteratius
+### Disseny inductiu d’algoritmes iteratius
 
 La idea és obtenir primer l’invariant, i després les instruccions del bucle. 
 > Passos:
@@ -471,7 +471,7 @@ La idea és obtenir primer l’invariant, i després les instruccions del bucl
 > - Veure quines instruccions necessita el cos del bucle per tal que si a l’entrada d’aquest es compleix l’invariant, al final de l’execució del cos del bucle també es complirà. I donat que cada iteració del bucle ens ha d’apropar al final de l’execució d’aquest, hem de trobar una funció que decreixi en cada iteració.
 > - A més hem de veure quines instruccions o inicialitzacions faran que es compleixi l’invariant abans d’entrar al bucle.
 
-###Exemple:
+### Exemple:
 
 - Codi
 ```cpp
