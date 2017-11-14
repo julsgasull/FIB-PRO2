@@ -565,3 +565,107 @@ La justificació informal d’aquesta funció recursiva és la següent.
 - Cas recursiu. Si les piles no són buides i els cims són iguals, llavors les piles són iguals si coincideixen en la resta d’elements. Això ho podem obtenir, per hipòtesi d’inducció, cridant recursivament a la funció amb les piles sense l’element del cim (podem fer-ho perquè les piles no són buides). Per això assignem a ret el resultat de la crida recursiva.
 - Acabament. A cada crida recursiva fem més petita la primera pila (i la segona).
 
+### Immersió o generalització de funcions
+**Objectiu:** fer un programa recursiu o millorar el recursiu que ja tenim per fer-lo més eficient.
+
+**Immersió:** és una funció on,
+
+- Introduïm paràmetres addicionals 
+i/o
+- Introduïm resultats addicionals
+
+Amb això o reforçarem la precondició o afeblirem la postcondició.
+
+**Tipus d'immersió:** per dades i per resultats.
+
+> 
+
+#### Afebliment de postcondició
+Amb paràmetres addicionals -> postcondició feble
+
+- Codi original
+```c
+int suma_vect_int(const vector<int> &v)
+/* Pre: v.size()>0 */
+/* Post: el valor retornat és la suma de
+tots els elements del vector */
+```
+
+- Codi posterior
+``` c
+int i_suma_vect_int(const vector<int> &v, int i) /* Pre: v.size()>0, 0<=i<v.size() */
+/* Post: el valor retornat és la suma de
+v[0..i] */
+{
+	int suma;
+	if (i == 0) suma = v[0]; 
+	else 
+	{
+		suma= i_suma_vect_int(v,i-1);
+		/* HI: "suma" és la suma de v[0..i-1] */ 
+		suma += v[i];
+	}
+	return suma;
+}
+```
+- Codi resolt
+```cpp
+int suma_vect_int(const vector<int> &v)
+	/* Pre: v.size()>0 */
+	/* Post: el valor retornat és la suma
+	de tots els elements del vector */ 
+{
+	return i_suma_vect_int(v,v.size()-1); 
+}
+```
+
+> **SOLUCIÓ**
+>-  **Cas senzill.** Si i=0, la postcondició requereix obtenir la suma de v[0..0], que òbviament és v[0] i serà el que retornarem.
+> - **Cas recursiu.** Si i!=0, la suma de v[0..i] que ens demanen a la postcondició equival a la suma de v[0..i-1] més v[i]. Per hipòtesi d’inducció, la primera part ja l’hem obtingut amb la crida recursiva i val suma. En conseqüència, el resultat a retornar serà suma+v[i]. La crida és vàlida perquè si i!=0 i apliquem la precondició ens queda que 0 < i o equivalentment 0 <= i-1. L’accés a v[i] és correcte per la precondició.
+> - **Acabament.** A cada crida recursiva el valor d’i es fa més petit.
+
+ 
+#### Reforçament de precondició
+**Objectiu:** obtenir funció auxiliar amb precondició original reforçada amb versió feble de postcondició original ->  s’escurça el camí cap a la consecució de l’objectiu que marca la postcondició.
+
+- Codi original
+```cpp
+int suma_vect_int(const vector<int> &v)
+	/* Pre: v.size()>0 */
+	/* Post: el valor retornat és la
+	suma de tots els elements del vector */
+```
+
+- Codi posterior
+```cpp
+int ii_suma_vect_int(const vector<int> &v, int i, int suma_parcial)
+	/* Pre: v.size()>0, 0<=i<=v.size(),
+	suma_parcial = suma de v[0..i-1] */
+	/* Post: el valor retornat és la suma
+	de tots els elements del vector v */ 
+{
+	int suma;
+	if (i == v.size()) suma = suma_parcial;
+	else suma= ii_suma_vect_int(v,i+1,suma_parcial+v[i]);
+	return suma;
+}
+```
+- Codi resolt
+```cpp
+int suma_vect_int(const vector<int> &v)
+	/* Pre: v.size()>0 */
+	/* Post: el valor retornat és la
+	suma de tots els elements del vector */ 
+{
+	return ii_suma_vect_int(v,0,0); 
+}
+```
+
+> **SOLUCIÓ**
+> - **Cas senzill.** Si i=v.size(), per la precondició tenim a suma_parcial la suma de tot el vector, que és el que ens demanen a la postcondició i serà el que retornarem.
+> - **Cas recursiu.** Si i!=v.size(), sabem per la precondició de la funció que i < v.size(), per tant i+1<=v.size(). La resta de la precondició de la crida recursiva queda suma_parcial = suma dels elements de v[0..i] o equivalentment suma_parcial = suma dels elements de v[0..i-1] + v[i]. Per la precondició de la funció, la primera part la tenim a la suma_parcial original, de manera que el nou valor de suma_parcial haurà de ser suma_parcial+v[i]. L’accés a v[i] és correcte ja que la precondició diu que 0 <= i i, com ja hem vist, i < v.size().
+> - **Acabament.** A cada crida recursiva el valor de v.size()-i es fa més petit.
+
+
+----------
+
