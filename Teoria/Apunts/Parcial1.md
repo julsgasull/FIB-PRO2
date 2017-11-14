@@ -666,6 +666,237 @@ int suma_vect_int(const vector<int> &v)
 > - **Cas recursiu.** Si i!=v.size(), sabem per la precondició de la funció que i < v.size(), per tant i+1<=v.size(). La resta de la precondició de la crida recursiva queda suma_parcial = suma dels elements de v[0..i] o equivalentment suma_parcial = suma dels elements de v[0..i-1] + v[i]. Per la precondició de la funció, la primera part la tenim a la suma_parcial original, de manera que el nou valor de suma_parcial haurà de ser suma_parcial+v[i]. L’accés a v[i] és correcte ja que la precondició diu que 0 <= i i, com ja hem vist, i < v.size().
 > - **Acabament.** A cada crida recursiva el valor de v.size()-i es fa més petit.
 
+----------
+
+Programa mida arbre
+===================
+
+```cpp
+#include "BinTreeIOint.hh"
+
+/* Pre: cierto */
+/* Post: El resultado es el número
+de nodos de a. */
+int mida(const BinTree<int>& a) 
+{
+	int h; 
+	if (a.empty()) h = 0;
+	else 
+	{
+		int h1 = mida(a.left());
+			/* HI: El resultado es el 
+			número de nodos de a.left(). */
+	     int h2 = mida(a.right());
+		    /* HI: El resultado es el
+		    número de nodos de a.right(). */
+	     h = h1 + h2 + 1; 
+	}
+	return h;
+}
+
+int main() {
+  BinTree<int> a = read();
+  cout << mida(a) << endl;
+}
+```
+
 
 ----------
+
+Millores d'eficiència en programes recursius i iteratius
+========================================================
+
+Eficiència de programes
+-----------------------
+**Eficiència:** mesura de recursos que necessita un programa per funcionar.
+**Recursos:** temps execució i espai de memòria -> hem d'arribar a compromís entre les dos.
+
+Millores d'eficiència d'algorismes recursius
+--------------------------------------------
+Eina: immersió
+### Fibonacci:
+> fib(0) = 0
+> fib(1) = 1
+> fib(n) = fib(n-2) + fib(n-2) si n > 1
+
+- Codi pimari
+```cpp
+int fib (int n)
+	/*Pre:nésunenter>=0*/
+	/* Post: el resultat és el terme
+	n-èssim de la successió de Fibonnaci */
+{
+	int res;
+	if (n<2) res = n;
+	else res = fib(n-1) + fib(n-2); 
+	return res;
+}
+```
+
+- Codi millorat en eficiència (en calcula 2 en una iteració):
+```cpp
+pair<int,int> fib_ef (int n)
+	/*Pre:nésunenter>0*/
+	/* Post: el primer component del
+	resultat és fib(n); el segon és fib(n-1) */
+{
+	pair<int, int> y;
+	if (n==1) {y.first=1; y.second=0;} 
+	else 
+	{
+		y = fib_ef(n-1);
+			/* HI: y.first és fib(n-1); 
+			y.second és fib(n-2) */ 
+		int aux;
+		aux = y.first;
+		y.first = y.first + y.second;
+		y.second = aux;
+	}
+	return y; 
+}
+```
+- Un altre codi (per fer n = 0)
+```cpp
+int fib (int n)
+	/* Pre: n>=0 */
+	/* Post: el resultat és el terme
+	n-èssim de la successió de Fibonnaci */ 
+{
+	int res;
+	pair<int, int> res2; 
+	if (n==0) res=0; 
+	else 
+	{
+		res2 = fib_ef(n);
+		res = res2.first;
+	}
+	return res; 
+}
+```
+
+- Més codi:
+```cpp
+int fib_ef_param(int n, int i, int f1, int f2)
+	/* Pre: 0<i<=n, f1=fib(i-1), f2=fib(i) */
+	/* Post: el resultat és el terme n-èssim
+	de la successió de Fibonnaci */ 
+{
+	int f;
+	if (i == n) f = f2;
+	else f = fib_ef_param(n, i+1, f2, f1+f2); 
+	{HI: Post} 
+	return f;
+}
+```
+
+Amb aquesta solució, fib 0 s’ha de calcular a part. La funció completa quedaria així, amb la crida a la immersió.
+```cpp
+int fib (int n)
+	/* Pre: n>=0 */
+	/* Post: el resultat és el terme
+{
+	int res;
+	if (n == 0) res=0;
+	else res = fib_ef_param (n,1,0,1);
+	return res;
+```
+
+
+Millores d'eficiència d'algoritmes iteratius
+--------------------------------------------
+Aquest cop, l’estratègia consistirà en fer servir el resultat de cada volta del bucle corresponent per minimitzar el cost del càlcul de la següent. Per fer això, introduirem variables locals.
+
+### Funció de taylor
+- Primer codi
+```cpp
+double pot (double a, int b) 
+	/* Pre: a>0; b>=0 */
+	/* Post: el resultat és a^b */ 
+{
+	double p = 1; 
+	while (b > 0) 
+	{
+		p *= a;
+		--b;
+	}
+	return p;
+}
+
+int fact(int n)
+	/* Pre: n>=0 */
+	/* Post: El resultat és n! */ 
+{
+	intf = 1; 
+	while (n > 0)
+	{
+		f*=n;
+		--n;
+	}
+	return f; 
+}
+
+double taylor_exp(double x, int n)
+	/* Pre: n>=0 */
+	/* Post: el resultat és la suma fins
+	n de la sèrie de Taylor per a e^x */ 
+{
+	if (x == 0) return 1; // x!=0
+	double t = 1;
+	int i = 1;
+	// Inv: t és la suma fins i-1 de la sèrie de Taylor per a e^x 
+	while (i<=n) 
+	{
+		t+=pot(x,i)/fact(i);
+		++i; 
+	}
+	return t; 
+}
+```
+- Segon codi
+```cpp
+double taylor_exp_ef1(double x, int n)
+	/* Pre: n>=0 */
+	/* Post: retorna la suma fins
+	n de la sèrie de Taylor per a e^x */ 
+{
+	if (x==0) return 1; 
+	double t=1;
+	int f=1;
+	double p=1;
+	int i=1;
+	// Inv: t és la suma fins i-1 de la sèrie de Taylor per a e^x
+	// p = x^(i-1); f=(i-1)!; 
+	while (i<=n) 
+	{
+		p*=x; //p=x^i
+		t+=p/f;
+		++i;
+	}
+	return t;
+}
+```
+- Tercer codi
+```cpp
+double taylor_exp_ef2(double x, int n)
+	/* Pre: n>=0 */
+	/* Post: retorna la suma fins
+	n de la sèrie de Taylor per a e^x */ {
+	if (x==0) return 1; 
+	double t=1;
+	double pf=1;
+	int i=1;
+	// Inv: t és la suma fins i-1 de la sèrie de Taylor per a e^x 
+	// pf = x^(i-1)/(i-1)!;
+	while (i<=n)
+	{
+		pf*=x; //pf = x^i/(i-1)! 
+		pf/=i; //pf=x^i/i! 
+		t+=pf;
+		++i;
+	}
+	return t; 
+}
+```
+> existeixen més casos -> apunts
+
 
