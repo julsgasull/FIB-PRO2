@@ -434,5 +434,3 @@ void breadth_first_traversal(const BinTree<int>& a, list<int>& l)
 
 ----------
 
-- recórrer l’arbre dret (en postordre)
-- visitar l’arrel
