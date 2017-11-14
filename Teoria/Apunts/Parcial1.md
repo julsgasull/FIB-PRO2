@@ -501,3 +501,67 @@ bool cerca_iter1_vec_int(const vector<int> &v, int x)
 
 - **Acabament.** A cada volta decreix la distància entre v.size() i l’índex i, perquè incre- mentem i a cadascuna d’elles.
 
+
+Programació recursiva
+----------------------
+
+```cpp
+Tipus2 f(Tipus1 x) 
+	/* Pre: Q(x) */
+	/* Post: R(x,s) */ 
+{
+	Tipus2 r
+	Tipus2 s;
+	if (c(x)) s = d(x); 
+	else
+	{
+		r = f(g(x));
+		s = h(x,r);
+	}
+	return s; 
+}
+```
+
+### Disseny de programes recursius
+
+- Detectar els casos senzills i resoldre’ls sense crides recursives. En definitiva, mirant l’e- xemple abstracte de la secció anterior, consistiria en detectar la condició booleana de l’`if (c(x))` i el conjunt d’instruccions que s’han d’executar si es compleix `d(x)` . En aquests casos senzills, cal assegurar-se de que si les variables compleixen la precondició i la con- dició booleana del if, llavors després d’executar les instruccions (`d(x)` en el exemple) es compleix la postcondició de l’especificació de la funció. Per tant, s’ha de demostrar que `Q(x) i c(x) -> R(x,d(x))`.
+
+- Considerar el cas o casos recursius i resoldre’ls. Per poder generar les instruccions neces- sàries quan no es compleix la condició de l’`if`, hem de fer una crida recursiva a la mateixa funció amb un paràmetre d’entrada menor que l’actual. Per a que aquesta crida pugui fer-se, si x és el paràmetre d’entrada, haurem de demostrar que si `Q(x) i not c(x)`, llavors `g(x)` no és erroni i `g(x)` compleix la precondició de la funció recursiva, es a dir `Q(g(x))` . A partir de aquí, suposem la hipòtesi d’inducció que és l’afirmació: si `g(x)` compleix la precondició `Q(g(x))` , després d’executar la crida recursiva `f(g(x))` , el resultat r compleix la postcondició `R(g(x),r)` . A partir d’aquí hem d’afegir les línies de codi addicionals (`h(x,r)` en aquest cas) que siguin necessàries per a que el codi compleixi la postcondició `R(x, s)` . En altres paraules, hem de demostrar que si x compleix la condició d’entrada i la precondició, i si després de la crida recursiva es compleix la postcondició `R(g(x), r)` llavors també es compleix `R(x,h(x,r))` .Per tant hem de demostrar que `Q(x)i not c(x) i R(g(x), r) -> R(x, h(x, r))`.
+- Finalment, hem de raonar sobre les condiciones d’acabament del programa recursiu. És a dir, indicar quin paràmetre, paràmetres, o funció d’aquests, es va fent més petit en cada crida recursiva. En el nostre algoritme recursiu simplificat, si x és el paràmetre d’entrada, la funció del paràmetre x que decreix l’anomenem `t(x)` . D’aquesta manera verificarem que les crides recursives dintre de crides recursives són un nombre finit. Per tant, haurem de demostrar dues coses. Una, que `Q(x) -> t(x) pertany a N`, per assegurar-nos de que la funció que garanteix l’acabament de la recursivitat retorna un natural. L’altre, `Q(x) i not c(x) -> t(g(x)) < t(x)`, per assegurar-nos de que en les crides recursives utilitzem un paràmetre menor que el paràmetre d’entrada.
+
+Al procés descrit se l’anomena inductiu. Un cop generat el codi, podem demostrar la seva correcció utilitzant el principi d’inducció. El que volem demostrar és que tota crida a la funció recursiva compleix la postcondició. Veiem els passos:
+- Demostrar que el codi que se executa en els casos bàsics fa que es compleixi la postcondició. Això és equivalent a demostrar P(0) , ja que hem fet zero crides recursives, i demostrem que complim l’especificació. Per tant, P(0) correspon a `R(x, d(x))` .
+- Demostrar la correcció del cas recursiu. És a dir hem de demostrar  `Per tot n que pertany a N (P(n) -> P(n+1))`o bé `Per tot y < x (P(y) -> P(x))`. Hem de suposar que la crida recursiva és correcta, és a dir que si `g(x)` és més petit que x i compleix la precondició, llavors `f(g(x))` compleix la postcondició. A partir d’aquí, només queda demostrar que les instruccions posteriors a la crida arriben a la postcondició original. L’enunciat que consisteix en afirmar que la crida recursiva retorna el resultat desitjat (perquè s’ha cridat correctament i acaba) s’anomena hipòtesi d’inducció, i és un element essencial de la demostració.
+
+### Exemples
+
+```cpp
+bool piles_iguals(stack<int> &p1, stack<int> &p2)
+	/* Pre: p1 = P1 i p2 = P2 */
+	/* Post: El resultat ens indica si les
+	dues piles inicials P1 i P2 són iguals */ 
+{
+	bool ret;
+	if (p1.empty() or p2.empty()) ret=p1.empty() and p2.empty(); 
+	else if (p1.top()!=p2.top()) ret = false;
+	else 
+	{
+		p1.pop();
+		p2.pop();
+		ret = piles_iguals(p1,p2);
+	/* HI: ret="P1 sense l’últim element
+	afegit i P2 sense l’últim element afegit
+	són dues piles iguals" */ 
+	}
+	return ret;
+}
+```
+La justificació informal d’aquesta funció recursiva és la següent. 
+
+- Casos senzills.
+1. Si alguna de les dues piles és buida, llavors les piles són iguals si les dues són buides. Per tant assignem a ret l’expressió (p1.empty() and p2.empty()).
+2. Si les dues piles no són buides, en podem consultar els cims, però si són diferents, llavors les piles no poden ser iguals. Per tant posem ret a fals.
+
+- Cas recursiu. Si les piles no són buides i els cims són iguals, llavors les piles són iguals si coincideixen en la resta d’elements. Això ho podem obtenir, per hipòtesi d’inducció, cridant recursivament a la funció amb les piles sense l’element del cim (podem fer-ho perquè les piles no són buides). Per això assignem a ret el resultat de la crida recursiva.
+- Acabament. A cada crida recursiva fem més petita la primera pila (i la segona).
+
