@@ -434,3 +434,70 @@ void breadth_first_traversal(const BinTree<int>& a, list<int>& l)
 
 ----------
 
+Correctesa de Programes Iteratius i Programació Recursiva
+==========================================================
+
+Correctesa de Programes Iteratius
+---------------------------------
+###Principi d'inducció:
+P x significa que x compleix la propietat P.
+![Inducció 1](https://github.com/julsgasull/PRO2/blob/master/Teoria/Imatges/induccio.png)
+![Inducció 2](https://github.com/julsgasull/PRO2/blob/master/Teoria/Imatges/induccio2.png)
+
+###Correctesa de programes iteratius:
+```cpp
+/* Pre */ inicialitzacions
+while (B) S
+/* Post */
+```
+
+> 1. Demostrar que **{Pre}Inicialitzacions{Invariant}** . 
+> És a dir, si les variables compleixen la precondició, després de realitzar les instruccions d’inicialització abans del bucle, les variables compliran l’invariant.
+> 2. Demostrar que **{Invariant i B}S{Invariant}** . 
+> És a dir, si les variables compleixen l’invariant i la condició d’entrada al bucle, després d’executar les instruccions d’aquest, es tornarà a complir l’invariant.
+> 3. Desmostrar que **{Invariant i not B} -> {Post}**
+> És a dir, si les variables compleixen l’invariant però no la condició d’entrada al bucle, llavors han de complir la postcondició.
+> 4. Hem d'assegurar que bucle acaba: **funció de fita**. (Aquest paràmetre ha d’apropar-nos cada cop més a la condició d’acabament del bucle, és a dir B.)
+> - Invariant -> t pertany a N (per assegurar-nos que si estem en la situació determinada per l’invariant, llavors t té un valor natural). 
+> - {Invariant i B i t = T}S{t < T} , per assegurar-nos que t decreix desprès de cada iteració.
+
+###Disseny inductiu d’algoritmes iteratius
+
+La idea és obtenir primer l’invariant, i després les instruccions del bucle. 
+> Passos:
+> 
+> - A partir fonamentalment de la postcondició, que és l’asserció que ens parla del que ha de assolir el bucle, hem de caracteritzar l’invariant. Per això hem de pensar que l’invariant ha de descriure un punt intermig de l’execució del bucle. Una altra manera de veure-ho és pensant que l’invariant és un afebliment de la postcondició, en el sentit de que és la postcondició respecte a la part tractada en l’execució. Per poder afeblir la postcondició necessitarem parlar de noves variables (seran variables locals en el codi), amb les que expressar l’invariant.
+> - A partir de l’invariant hem de deduir l’estat en el que l’execució ha acabat. Aquesta serà la condició d’acabament del bucle, i negant aquesta obtindrem la condició B del bucle.
+> - Veure quines instruccions necessita el cos del bucle per tal que si a l’entrada d’aquest es compleix l’invariant, al final de l’execució del cos del bucle també es complirà. I donat que cada iteració del bucle ens ha d’apropar al final de l’execució d’aquest, hem de trobar una funció que decreixi en cada iteració.
+> - A més hem de veure quines instruccions o inicialitzacions faran que es compleixi l’invariant abans d’entrar al bucle.
+
+###Exemple:
+
+- Codi
+```cpp
+bool cerca_iter1_vec_int(const vector<int> &v, int x)
+	/* Pre: cert */
+	/* Post: El resultat ens diu si x és
+	un element de v o no */
+{
+	int i = 0;
+	bool ret = false;
+	/* Inv: 0 <= i <= v.size(), ret = "l’enter
+	x és un element de v[0..i-1]" */
+	while(i < v.size() and not ret)
+	{ 
+		ret = (v[i] == x);
+		++i;
+	}
+	return ret;
+```
+
+- **Inicialitzacions.** Inicialment no hem comprovat cap element de v, per tant inicialitzem i a zero, la posició del primer element del vector, satisfent la primera part de l’invariant. Per satisfer la segona, cal posar el valor false a ret, donat que no pot existir l’enter x en un subvector buit v[0 .. -1].
+
+- **Condició de sortida.** Es pot sortir del bucle per dues raons:
+	- Si i arriba a ser v.size() vol dir, per l’invariant, que hem explorat tot el vector v i que ret ens diu si l’element x està a v, com es pretén a la postcondició.
+	- En cas contrari, com que per l’invariant tenim i <= v.size(), es compleix que i < v.size( ) i per sortir del bucle s’ha de cumplir que ret és cert. Però si abans d’arribar al final del vector v tenim que ret passa a ser true, voldrà dir (de nou per l’invariant) que hem trobat x al subvector v[0..i-1] i que ret ja ens diu que x està a v i també es compleix la postcondició.
+- **Cos del bucle.** Abans d’avançar l’índex i, hem de satisfer l’invariant canviant i per i+1. Necessitem que ret contingui la informació de si l’element x es troba al subvec- tor v[0..i]. Com que, si hem entrat al bucle vol dir que ret == false, i per l’invariant tenim que ret conté la informació sobre si x està al subvector v[0..i-1], queda clar que x no està al subvector v[0..i-1] i només ens cal veure si x és igual a v[i], i actualit- zar el valor de ret depenent de si són iguals o no. Un cop que tenim ret modificat, ja podem incrementar i assegurant que satisfem l’invariant. Noteu que, per entrar al bucle, i < v.size(), per tant, marca una posició vàlida del vector i després d’incrementar i es compleix que i <= v.size() (tal com demana l’invariant).
+
+- **Acabament.** A cada volta decreix la distància entre v.size() i l’índex i, perquè incre- mentem i a cadascuna d’elles.
+
