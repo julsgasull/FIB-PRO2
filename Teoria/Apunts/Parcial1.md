@@ -344,16 +344,95 @@ Recorreguts d'arbres en profunditat
 ![Arbre](https://github.com/julsgasull/PRO2/blob/master/Teoria/Imatges/arbre.png)
 
 1. Preordre (1, 2, 4, 5, 8, 3, 6, 9, 10 i 7.)
-- visitar l’arrel
-- recórrer l’arbre esquerre (en preordre)
-- recórrer l’arbre dret (en preordre)
+> - visitar l’arrel
+> - recórrer l’arbre esquerre (en preordre)
+> - recórrer l’arbre dret (en preordre)
 
 2. Inordre (4, 2, 8, 5, 1, 9, 6, 10, 3, i 7.)
-- recórrer l’arbre esquerre (en inordre)
-- visitar l’arrel
-- recórrer l’arbre dret (en inordre)
+> - recórrer l’arbre esquerre (en inordre)
+> - visitar l’arrel
+> - recórrer l’arbre dret (en inordre)
 
 3. Postordre (4, 8, 5, 2, 9, 10, 6, 7, 3, i 1.)
-- recórrer l’arbre esquerre (en postordre)
+> - recórrer l’arbre esquerre (en postordre)
+> - recórrer l’arbre dret (en postordre)
+> - visitar l’arrel
+
+```cpp
+list<int> preorder(const BinTree<int>& a)
+	/* Pre: cert */
+	/* Post: El resultat conté els nodes
+	d’a en preordre */
+{
+	list<int> l;
+	if (not a.empty())
+	{
+	    l = preorder(a.left());
+	    l.insert(l.begin(),a.value());
+	    l.splice(l.end(),preorder(a.right()));
+	}
+	return l;
+}
+```
+```cpp
+void inorder(const BinTree<int>& a, list<int>& l)
+	/* Pre: l = L */
+	/* Post: l conté L seguit dels nodes
+	d’a en inordre */
+{
+	if (not a.empty())
+	{
+		inorder(a.left(),l);
+	    l.insert(l.end(),a.value());
+	    inorder(a.right(),l);
+	}
+}
+```
+```cpp
+void postorder(const BinTree<int>& a, list<int>& l)
+	/* Pre: l = L */
+	/* Post: l conté L seguit dels nodes
+	d’a en postordre */
+{
+	if (not a.empty())
+	{
+		postorder(a.left(),l);
+		postorder(a.right(),l);
+		l.insert(l.end(),a.value());
+	}
+}
+```
+
+Recorreguts d'arbres en amplada
+--------------------
+(1, 2, 3, 4, 5, 6, 7, 8, 9, i 10.)
+```cpp
+void breadth_first_traversal(const BinTree<int>& a, list<int>& l)
+	/* Pre: l és buida */
+	/* Post: l conté els nodes d’a
+	en ordre creixent respecte al
+	nivell on es troben, i els de
+	cada nivell en ordre d’esquerra
+	a dreta */
+{
+	if (not a.empty())
+	{
+		queue <BinTree<int> > c;
+	    c.push(a);
+	    while (not c.empty())
+	    {
+		    BinTree<int> aux(c.front());
+		    l.insert(l.end(),aux.value());
+		    if (not aux.left().empty()) c.push(aux.left());
+		    if (not aux.right().empty()) c.push(aux.right());
+		    c.pop();
+		}
+	}
+}
+```
+
+
+----------
+
 - recórrer l’arbre dret (en postordre)
 - visitar l’arrel
