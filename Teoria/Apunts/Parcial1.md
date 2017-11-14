@@ -434,3 +434,557 @@ void breadth_first_traversal(const BinTree<int>& a, list<int>& l)
 
 ----------
 
+Correctesa de Programes Iteratius i Programació Recursiva
+==========================================================
+
+Correctesa de Programes Iteratius
+---------------------------------
+### Principi d'inducció:
+P x significa que x compleix la propietat P.
+![Inducció 1](https://github.com/julsgasull/PRO2/blob/master/Teoria/Imatges/induccio.png)
+![Inducció 2](https://github.com/julsgasull/PRO2/blob/master/Teoria/Imatges/induccio2.png)
+
+### Correctesa de programes iteratius:
+```cpp
+/* Pre */ inicialitzacions
+while (B) S
+/* Post */
+```
+
+> 1. Demostrar que **{Pre}Inicialitzacions{Invariant}** . 
+> És a dir, si les variables compleixen la precondició, després de realitzar les instruccions d’inicialització abans del bucle, les variables compliran l’invariant.
+> 2. Demostrar que **{Invariant i B}S{Invariant}** . 
+> És a dir, si les variables compleixen l’invariant i la condició d’entrada al bucle, després d’executar les instruccions d’aquest, es tornarà a complir l’invariant.
+> 3. Desmostrar que **{Invariant i not B} -> {Post}**
+> És a dir, si les variables compleixen l’invariant però no la condició d’entrada al bucle, llavors han de complir la postcondició.
+> 4. Hem d'assegurar que bucle acaba: **funció de fita**. (Aquest paràmetre ha d’apropar-nos cada cop més a la condició d’acabament del bucle, és a dir B.)
+> - Invariant -> t pertany a N (per assegurar-nos que si estem en la situació determinada per l’invariant, llavors t té un valor natural). 
+> - {Invariant i B i t = T}S{t < T} , per assegurar-nos que t decreix desprès de cada iteració.
+
+### Disseny inductiu d’algoritmes iteratius
+
+La idea és obtenir primer l’invariant, i després les instruccions del bucle. 
+> Passos:
+> 
+> - A partir fonamentalment de la postcondició, que és l’asserció que ens parla del que ha de assolir el bucle, hem de caracteritzar l’invariant. Per això hem de pensar que l’invariant ha de descriure un punt intermig de l’execució del bucle. Una altra manera de veure-ho és pensant que l’invariant és un afebliment de la postcondició, en el sentit de que és la postcondició respecte a la part tractada en l’execució. Per poder afeblir la postcondició necessitarem parlar de noves variables (seran variables locals en el codi), amb les que expressar l’invariant.
+> - A partir de l’invariant hem de deduir l’estat en el que l’execució ha acabat. Aquesta serà la condició d’acabament del bucle, i negant aquesta obtindrem la condició B del bucle.
+> - Veure quines instruccions necessita el cos del bucle per tal que si a l’entrada d’aquest es compleix l’invariant, al final de l’execució del cos del bucle també es complirà. I donat que cada iteració del bucle ens ha d’apropar al final de l’execució d’aquest, hem de trobar una funció que decreixi en cada iteració.
+> - A més hem de veure quines instruccions o inicialitzacions faran que es compleixi l’invariant abans d’entrar al bucle.
+
+### Exemple:
+
+- Codi
+```cpp
+bool cerca_iter1_vec_int(const vector<int> &v, int x)
+	/* Pre: cert */
+	/* Post: El resultat ens diu si x és
+	un element de v o no */
+{
+	int i = 0;
+	bool ret = false;
+	/* Inv: 0 <= i <= v.size(), ret = "l’enter
+	x és un element de v[0..i-1]" */
+	while(i < v.size() and not ret)
+	{ 
+		ret = (v[i] == x);
+		++i;
+	}
+	return ret;
+```
+
+- **Inicialitzacions.** Inicialment no hem comprovat cap element de v, per tant inicialitzem i a zero, la posició del primer element del vector, satisfent la primera part de l’invariant. Per satisfer la segona, cal posar el valor false a ret, donat que no pot existir l’enter x en un subvector buit v[0 .. -1].
+
+- **Condició de sortida.** Es pot sortir del bucle per dues raons:
+	- Si i arriba a ser v.size() vol dir, per l’invariant, que hem explorat tot el vector v i que ret ens diu si l’element x està a v, com es pretén a la postcondició.
+	- En cas contrari, com que per l’invariant tenim i <= v.size(), es compleix que i < v.size( ) i per sortir del bucle s’ha de cumplir que ret és cert. Però si abans d’arribar al final del vector v tenim que ret passa a ser true, voldrà dir (de nou per l’invariant) que hem trobat x al subvector v[0..i-1] i que ret ja ens diu que x està a v i també es compleix la postcondició.
+- **Cos del bucle.** Abans d’avançar l’índex i, hem de satisfer l’invariant canviant i per i+1. Necessitem que ret contingui la informació de si l’element x es troba al subvec- tor v[0..i]. Com que, si hem entrat al bucle vol dir que ret == false, i per l’invariant tenim que ret conté la informació sobre si x està al subvector v[0..i-1], queda clar que x no està al subvector v[0..i-1] i només ens cal veure si x és igual a v[i], i actualit- zar el valor de ret depenent de si són iguals o no. Un cop que tenim ret modificat, ja podem incrementar i assegurant que satisfem l’invariant. Noteu que, per entrar al bucle, i < v.size(), per tant, marca una posició vàlida del vector i després d’incrementar i es compleix que i <= v.size() (tal com demana l’invariant).
+
+- **Acabament.** A cada volta decreix la distància entre v.size() i l’índex i, perquè incre- mentem i a cadascuna d’elles.
+
+
+Programació recursiva
+----------------------
+
+```cpp
+Tipus2 f(Tipus1 x) 
+	/* Pre: Q(x) */
+	/* Post: R(x,s) */ 
+{
+	Tipus2 r
+	Tipus2 s;
+	if (c(x)) s = d(x); 
+	else
+	{
+		r = f(g(x));
+		s = h(x,r);
+	}
+	return s; 
+}
+```
+
+### Disseny de programes recursius
+
+- Detectar els casos senzills i resoldre’ls sense crides recursives. En definitiva, mirant l’e- xemple abstracte de la secció anterior, consistiria en detectar la condició booleana de l’`if (c(x))` i el conjunt d’instruccions que s’han d’executar si es compleix `d(x)` . En aquests casos senzills, cal assegurar-se de que si les variables compleixen la precondició i la con- dició booleana del if, llavors després d’executar les instruccions (`d(x)` en el exemple) es compleix la postcondició de l’especificació de la funció. Per tant, s’ha de demostrar que `Q(x) i c(x) -> R(x,d(x))`.
+
+- Considerar el cas o casos recursius i resoldre’ls. Per poder generar les instruccions neces- sàries quan no es compleix la condició de l’`if`, hem de fer una crida recursiva a la mateixa funció amb un paràmetre d’entrada menor que l’actual. Per a que aquesta crida pugui fer-se, si x és el paràmetre d’entrada, haurem de demostrar que si `Q(x) i not c(x)`, llavors `g(x)` no és erroni i `g(x)` compleix la precondició de la funció recursiva, es a dir `Q(g(x))` . A partir de aquí, suposem la hipòtesi d’inducció que és l’afirmació: si `g(x)` compleix la precondició `Q(g(x))` , després d’executar la crida recursiva `f(g(x))` , el resultat r compleix la postcondició `R(g(x),r)` . A partir d’aquí hem d’afegir les línies de codi addicionals (`h(x,r)` en aquest cas) que siguin necessàries per a que el codi compleixi la postcondició `R(x, s)` . En altres paraules, hem de demostrar que si x compleix la condició d’entrada i la precondició, i si després de la crida recursiva es compleix la postcondició `R(g(x), r)` llavors també es compleix `R(x,h(x,r))` .Per tant hem de demostrar que `Q(x)i not c(x) i R(g(x), r) -> R(x, h(x, r))`.
+- Finalment, hem de raonar sobre les condiciones d’acabament del programa recursiu. És a dir, indicar quin paràmetre, paràmetres, o funció d’aquests, es va fent més petit en cada crida recursiva. En el nostre algoritme recursiu simplificat, si x és el paràmetre d’entrada, la funció del paràmetre x que decreix l’anomenem `t(x)` . D’aquesta manera verificarem que les crides recursives dintre de crides recursives són un nombre finit. Per tant, haurem de demostrar dues coses. Una, que `Q(x) -> t(x) pertany a N`, per assegurar-nos de que la funció que garanteix l’acabament de la recursivitat retorna un natural. L’altre, `Q(x) i not c(x) -> t(g(x)) < t(x)`, per assegurar-nos de que en les crides recursives utilitzem un paràmetre menor que el paràmetre d’entrada.
+
+Al procés descrit se l’anomena inductiu. Un cop generat el codi, podem demostrar la seva correcció utilitzant el principi d’inducció. El que volem demostrar és que tota crida a la funció recursiva compleix la postcondició. Veiem els passos:
+- Demostrar que el codi que se executa en els casos bàsics fa que es compleixi la postcondició. Això és equivalent a demostrar P(0) , ja que hem fet zero crides recursives, i demostrem que complim l’especificació. Per tant, P(0) correspon a `R(x, d(x))` .
+- Demostrar la correcció del cas recursiu. És a dir hem de demostrar  `Per tot n que pertany a N (P(n) -> P(n+1))`o bé `Per tot y < x (P(y) -> P(x))`. Hem de suposar que la crida recursiva és correcta, és a dir que si `g(x)` és més petit que x i compleix la precondició, llavors `f(g(x))` compleix la postcondició. A partir d’aquí, només queda demostrar que les instruccions posteriors a la crida arriben a la postcondició original. L’enunciat que consisteix en afirmar que la crida recursiva retorna el resultat desitjat (perquè s’ha cridat correctament i acaba) s’anomena hipòtesi d’inducció, i és un element essencial de la demostració.
+
+### Exemples
+
+```cpp
+bool piles_iguals(stack<int> &p1, stack<int> &p2)
+	/* Pre: p1 = P1 i p2 = P2 */
+	/* Post: El resultat ens indica si les
+	dues piles inicials P1 i P2 són iguals */ 
+{
+	bool ret;
+	if (p1.empty() or p2.empty()) ret=p1.empty() and p2.empty(); 
+	else if (p1.top()!=p2.top()) ret = false;
+	else 
+	{
+		p1.pop();
+		p2.pop();
+		ret = piles_iguals(p1,p2);
+	/* HI: ret="P1 sense l’últim element
+	afegit i P2 sense l’últim element afegit
+	són dues piles iguals" */ 
+	}
+	return ret;
+}
+```
+La justificació informal d’aquesta funció recursiva és la següent. 
+
+- Casos senzills.
+1. Si alguna de les dues piles és buida, llavors les piles són iguals si les dues són buides. Per tant assignem a ret l’expressió (p1.empty() and p2.empty()).
+2. Si les dues piles no són buides, en podem consultar els cims, però si són diferents, llavors les piles no poden ser iguals. Per tant posem ret a fals.
+
+- Cas recursiu. Si les piles no són buides i els cims són iguals, llavors les piles són iguals si coincideixen en la resta d’elements. Això ho podem obtenir, per hipòtesi d’inducció, cridant recursivament a la funció amb les piles sense l’element del cim (podem fer-ho perquè les piles no són buides). Per això assignem a ret el resultat de la crida recursiva.
+- Acabament. A cada crida recursiva fem més petita la primera pila (i la segona).
+
+### Immersió o generalització de funcions
+**Objectiu:** fer un programa recursiu o millorar el recursiu que ja tenim per fer-lo més eficient.
+
+**Immersió:** és una funció on,
+
+- Introduïm paràmetres addicionals 
+i/o
+- Introduïm resultats addicionals
+
+Amb això o reforçarem la precondició o afeblirem la postcondició.
+
+**Tipus d'immersió:** per dades i per resultats.
+
+> 
+
+#### Afebliment de postcondició
+Amb paràmetres addicionals -> postcondició feble
+
+- Codi original
+```c
+int suma_vect_int(const vector<int> &v)
+/* Pre: v.size()>0 */
+/* Post: el valor retornat és la suma de
+tots els elements del vector */
+```
+
+- Codi posterior
+``` c
+int i_suma_vect_int(const vector<int> &v, int i) /* Pre: v.size()>0, 0<=i<v.size() */
+/* Post: el valor retornat és la suma de
+v[0..i] */
+{
+	int suma;
+	if (i == 0) suma = v[0]; 
+	else 
+	{
+		suma= i_suma_vect_int(v,i-1);
+		/* HI: "suma" és la suma de v[0..i-1] */ 
+		suma += v[i];
+	}
+	return suma;
+}
+```
+- Codi resolt
+```cpp
+int suma_vect_int(const vector<int> &v)
+	/* Pre: v.size()>0 */
+	/* Post: el valor retornat és la suma
+	de tots els elements del vector */ 
+{
+	return i_suma_vect_int(v,v.size()-1); 
+}
+```
+
+> **SOLUCIÓ**
+>-  **Cas senzill.** Si i=0, la postcondició requereix obtenir la suma de v[0..0], que òbviament és v[0] i serà el que retornarem.
+> - **Cas recursiu.** Si i!=0, la suma de v[0..i] que ens demanen a la postcondició equival a la suma de v[0..i-1] més v[i]. Per hipòtesi d’inducció, la primera part ja l’hem obtingut amb la crida recursiva i val suma. En conseqüència, el resultat a retornar serà suma+v[i]. La crida és vàlida perquè si i!=0 i apliquem la precondició ens queda que 0 < i o equivalentment 0 <= i-1. L’accés a v[i] és correcte per la precondició.
+> - **Acabament.** A cada crida recursiva el valor d’i es fa més petit.
+
+ 
+#### Reforçament de precondició
+**Objectiu:** obtenir funció auxiliar amb precondició original reforçada amb versió feble de postcondició original ->  s’escurça el camí cap a la consecució de l’objectiu que marca la postcondició.
+
+- Codi original
+```cpp
+int suma_vect_int(const vector<int> &v)
+	/* Pre: v.size()>0 */
+	/* Post: el valor retornat és la
+	suma de tots els elements del vector */
+```
+
+- Codi posterior
+```cpp
+int ii_suma_vect_int(const vector<int> &v, int i, int suma_parcial)
+	/* Pre: v.size()>0, 0<=i<=v.size(),
+	suma_parcial = suma de v[0..i-1] */
+	/* Post: el valor retornat és la suma
+	de tots els elements del vector v */ 
+{
+	int suma;
+	if (i == v.size()) suma = suma_parcial;
+	else suma= ii_suma_vect_int(v,i+1,suma_parcial+v[i]);
+	return suma;
+}
+```
+- Codi resolt
+```cpp
+int suma_vect_int(const vector<int> &v)
+	/* Pre: v.size()>0 */
+	/* Post: el valor retornat és la
+	suma de tots els elements del vector */ 
+{
+	return ii_suma_vect_int(v,0,0); 
+}
+```
+
+> **SOLUCIÓ**
+> - **Cas senzill.** Si i=v.size(), per la precondició tenim a suma_parcial la suma de tot el vector, que és el que ens demanen a la postcondició i serà el que retornarem.
+> - **Cas recursiu.** Si i!=v.size(), sabem per la precondició de la funció que i < v.size(), per tant i+1<=v.size(). La resta de la precondició de la crida recursiva queda suma_parcial = suma dels elements de v[0..i] o equivalentment suma_parcial = suma dels elements de v[0..i-1] + v[i]. Per la precondició de la funció, la primera part la tenim a la suma_parcial original, de manera que el nou valor de suma_parcial haurà de ser suma_parcial+v[i]. L’accés a v[i] és correcte ja que la precondició diu que 0 <= i i, com ja hem vist, i < v.size().
+> - **Acabament.** A cada crida recursiva el valor de v.size()-i es fa més petit.
+
+----------
+
+Programa mida arbre
+===================
+
+```cpp
+#include "BinTreeIOint.hh"
+
+/* Pre: cierto */
+/* Post: El resultado es el número
+de nodos de a. */
+int mida(const BinTree<int>& a) 
+{
+	int h; 
+	if (a.empty()) h = 0;
+	else 
+	{
+		int h1 = mida(a.left());
+			/* HI: El resultado es el 
+			número de nodos de a.left(). */
+	     int h2 = mida(a.right());
+		    /* HI: El resultado es el
+		    número de nodos de a.right(). */
+	     h = h1 + h2 + 1; 
+	}
+	return h;
+}
+
+int main() {
+  BinTree<int> a = read();
+  cout << mida(a) << endl;
+}
+```
+
+
+----------
+
+Millores d'eficiència en programes recursius i iteratius
+========================================================
+
+Eficiència de programes
+-----------------------
+**Eficiència:** mesura de recursos que necessita un programa per funcionar.
+**Recursos:** temps execució i espai de memòria -> hem d'arribar a compromís entre les dos.
+
+Millores d'eficiència d'algorismes recursius
+--------------------------------------------
+Eina: immersió
+### Fibonacci:
+> fib(0) = 0
+> fib(1) = 1
+> fib(n) = fib(n-2) + fib(n-2) si n > 1
+
+- Codi pimari
+```cpp
+int fib (int n)
+	/*Pre:nésunenter>=0*/
+	/* Post: el resultat és el terme
+	n-èssim de la successió de Fibonnaci */
+{
+	int res;
+	if (n<2) res = n;
+	else res = fib(n-1) + fib(n-2); 
+	return res;
+}
+```
+
+- Codi millorat en eficiència (en calcula 2 en una iteració):
+```cpp
+pair<int,int> fib_ef (int n)
+	/*Pre:nésunenter>0*/
+	/* Post: el primer component del
+	resultat és fib(n); el segon és fib(n-1) */
+{
+	pair<int, int> y;
+	if (n==1) {y.first=1; y.second=0;} 
+	else 
+	{
+		y = fib_ef(n-1);
+			/* HI: y.first és fib(n-1); 
+			y.second és fib(n-2) */ 
+		int aux;
+		aux = y.first;
+		y.first = y.first + y.second;
+		y.second = aux;
+	}
+	return y; 
+}
+```
+- Un altre codi (per fer n = 0)
+```cpp
+int fib (int n)
+	/* Pre: n>=0 */
+	/* Post: el resultat és el terme
+	n-èssim de la successió de Fibonnaci */ 
+{
+	int res;
+	pair<int, int> res2; 
+	if (n==0) res=0; 
+	else 
+	{
+		res2 = fib_ef(n);
+		res = res2.first;
+	}
+	return res; 
+}
+```
+
+- Més codi:
+```cpp
+int fib_ef_param(int n, int i, int f1, int f2)
+	/* Pre: 0<i<=n, f1=fib(i-1), f2=fib(i) */
+	/* Post: el resultat és el terme n-èssim
+	de la successió de Fibonnaci */ 
+{
+	int f;
+	if (i == n) f = f2;
+	else f = fib_ef_param(n, i+1, f2, f1+f2); 
+	{HI: Post} 
+	return f;
+}
+```
+
+Amb aquesta solució, fib 0 s’ha de calcular a part. La funció completa quedaria així, amb la crida a la immersió.
+```cpp
+int fib (int n)
+	/* Pre: n>=0 */
+	/* Post: el resultat és el terme
+{
+	int res;
+	if (n == 0) res=0;
+	else res = fib_ef_param (n,1,0,1);
+	return res;
+```
+
+
+Millores d'eficiència d'algoritmes iteratius
+--------------------------------------------
+Aquest cop, l’estratègia consistirà en fer servir el resultat de cada volta del bucle corresponent per minimitzar el cost del càlcul de la següent. Per fer això, introduirem variables locals.
+
+### Funció de taylor
+- Primer codi
+```cpp
+double pot (double a, int b) 
+	/* Pre: a>0; b>=0 */
+	/* Post: el resultat és a^b */ 
+{
+	double p = 1; 
+	while (b > 0) 
+	{
+		p *= a;
+		--b;
+	}
+	return p;
+}
+
+int fact(int n)
+	/* Pre: n>=0 */
+	/* Post: El resultat és n! */ 
+{
+	intf = 1; 
+	while (n > 0)
+	{
+		f*=n;
+		--n;
+	}
+	return f; 
+}
+
+double taylor_exp(double x, int n)
+	/* Pre: n>=0 */
+	/* Post: el resultat és la suma fins
+	n de la sèrie de Taylor per a e^x */ 
+{
+	if (x == 0) return 1; // x!=0
+	double t = 1;
+	int i = 1;
+	// Inv: t és la suma fins i-1 de la sèrie de Taylor per a e^x 
+	while (i<=n) 
+	{
+		t+=pot(x,i)/fact(i);
+		++i; 
+	}
+	return t; 
+}
+```
+- Segon codi
+```cpp
+double taylor_exp_ef1(double x, int n)
+	/* Pre: n>=0 */
+	/* Post: retorna la suma fins
+	n de la sèrie de Taylor per a e^x */ 
+{
+	if (x==0) return 1; 
+	double t=1;
+	int f=1;
+	double p=1;
+	int i=1;
+	// Inv: t és la suma fins i-1 de la sèrie de Taylor per a e^x
+	// p = x^(i-1); f=(i-1)!; 
+	while (i<=n) 
+	{
+		p*=x; //p=x^i
+		t+=p/f;
+		++i;
+	}
+	return t;
+}
+```
+- Tercer codi
+```cpp
+double taylor_exp_ef2(double x, int n)
+	/* Pre: n>=0 */
+	/* Post: retorna la suma fins
+	n de la sèrie de Taylor per a e^x */ {
+	if (x==0) return 1; 
+	double t=1;
+	double pf=1;
+	int i=1;
+	// Inv: t és la suma fins i-1 de la sèrie de Taylor per a e^x 
+	// pf = x^(i-1)/(i-1)!;
+	while (i<=n)
+	{
+		pf*=x; //pf = x^i/(i-1)! 
+		pf/=i; //pf=x^i/i! 
+		t+=pf;
+		++i;
+	}
+	return t; 
+}
+```
+> existeixen més casos -> apunts
+
+----------
+
+```cpp
+/* Este algoritmo es ineficiente */
+
+int altura(const BinTree<int>& a) {
+	/* Pre: cierto */
+	/* Post: El resultado es la longitud 
+	del camino más largo desde la raí­z a
+	una de las hojas de a. */
+
+	int h; 
+	if (a.empty()) h = 0;
+	else 
+	{
+		int h1 = altura(a.left());
+		     /* HI: El resultado es la longitud del camino
+		     más largo desde la raíz a una de las hojas de
+		     a.left(). */
+		int h2 = altura(a.right());
+		     /* HI: El resultado es la longitud del camino
+		     más largo desde la raíz a una de las hojas de
+		     a.right(). */
+	     h = max(h1,h2) + 1; 
+	}
+	return h;
+}
+
+bool equil(const BinTree<int>& a) 
+{
+	/* Pre: cierto */
+	/* Post: El resultado indica si
+	a es equilibrado. */
+ 
+	bool r; 
+	if (a.empty()) r = true;
+	else
+	{
+		int h1 = altura(a.left());
+	    int h2 = altura(a.right());
+	    if (abs(h1 - h2) > 1) r = false;
+	    else
+	    {
+	        r = equil(a.left());
+				/* HI: r indica si a.left()
+				es equilibrado. */
+	        if (r) r = equil(a.right());
+		        /* HI: r indica si a.right() 
+		        es equilibrado. */	
+	     }
+	}
+	return r;
+}
+```
+
+```cpp
+
+/* El siguiente algoritmo es más eficiente. 
+Es lineal en el tamaño de a. */
+
+pair<bool,int> equil_res(const BinTree<int>& a) {
+	/* Pre: cierto */
+	/* Post: La primera componente del resultado
+	indica si a es equilibrado. Si la primera
+	componente del resultado es cierta, la segunda
+	componente es la altura de a. */
+  
+	pair<bool,int> r; 
+	if (a.empty()) r = make_pair(true,0);
+	else 
+	{
+	    r = equil_res(a.left());
+		     /* HI: r.first indica si a.left()
+		     es equilibrado. Si r.first es true, 
+		     r.second es la altura de a.left(). */
+		if (r.first) 
+		{
+	        pair<bool,int> r2 = equil_res(a.right()); 
+			    /* HI: r2.first indica si a.right()
+			    es equilibrado. Si r2.first es true, 
+			    r.second es la altura de a.right(). */
+			if (not r2.first) r.first = false;
+			else if (abs(r.second - r2.second) > 1) r.first = false;
+	        else r = make_pair(true, max(r.second,r2.second) + 1); 
+	     }
+	}
+	return r;
+} 
+```
