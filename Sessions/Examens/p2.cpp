@@ -22,19 +22,15 @@ bool valor(const string &s)
     /* Post: El resultat és el valor de la variable amb identificador s al paràetre implícit. */
 }
 
-bool avaluar(Arbre<string> &a, const Variables &e)
+bool avaluar(BinTree<string> &a, const Variable &e)
 {
-    string s = a.arrel();
-    Arbre<string> a1 = a.left();
-    Arbre<string> a2 = a.right();
-    
-    if (s == "not") return not avaluar(a1, e);
-    if (s == "or") return avaluar(a1,e) or avaluar(a2,e);
-    if (s == "and") return avaluar(a1,e) and avaluar(a2,e);
-    if (s == "true") return true;
-    if (s == "false") return false;
-    
-    return e.valor(s);
+	string s = a.value();
+	if (s == "OR") return (avaluar(a.left(), e) or avaluar(a.right(), e))
+	else if (s == "AND") return (avaluar(a.left(), e) and avaluar(a.right(), e))
+	else if (s == "NOT") return not (avaluar(a.left(), e))
+	else if (s == "TRUE") return true;
+	else if (s == "FALSE") return false;
+	else return e.valor(s);
 }
 
 
