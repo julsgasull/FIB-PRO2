@@ -27,11 +27,24 @@ pair<int, CIt> max_long_esc(const Li& v)
         ++i;
         while (i != v.end())
         {
+<<<<<<< HEAD
             if (anterior <= *i) ++cont;
             else cont = 1;
             
             anterior = *i;
             
+=======
+            if (i != v.begin())
+            {
+                if (cont == 0) primer = i;
+                if (anterior <= *i or cont == 0)
+                {
+                    ++cont;
+                }
+                else cont = 0;
+                anterior = *i;
+            }
+>>>>>>> 6dd444ca93181586ca32a46df850d9ce0290b3e5
             if (cont > p.first) {
                 p.first = cont;
                 p.second = primer;
