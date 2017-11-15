@@ -23,22 +23,22 @@ pair<int, CIt> max_long_esc(const Li& v)
         int cont = 1;
         CIt primer = v.begin();
         int anterior = *v.begin();
-        for (CIt i = v.begin(); i != v.end(); ++i)
+        CIt i = v.begin();
+        ++i;
+        while (i != v.end())
         {
-            if (i != v.begin())
-            {
-                if (cont == 0) primer = i;
-                if (anterior <= *i)
-                {
-                    ++cont;
-                }
-                else cont = 0;
-                anterior = *i;
-            }
+            if (anterior <= *i) ++cont;
+            else cont = 1;
+            
+            anterior = *i;
+            
             if (cont > p.first) {
                 p.first = cont;
                 p.second = primer;
             }
+            
+            if (cont == 1) primer = i;
+            ++i;
         }
     }
     return p;
