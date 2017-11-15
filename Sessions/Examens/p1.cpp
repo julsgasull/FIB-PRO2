@@ -45,6 +45,7 @@ pair<int, CIt> max_long_esc(const Li& v)
     return p;
 }
 
+
 /*
      INVARIANT:
          (1)    i: v.begin() <= i <= v.end(). i = posició de l'element que mirem
