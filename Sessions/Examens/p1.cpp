@@ -28,7 +28,7 @@ pair<int, CIt> max_long_esc(const Li& v)
             if (i != v.begin())
             {
                 if (cont == 0) primer = i;
-                if (anterior <= *i)
+                if (anterior <= *i or cont == 0)
                 {
                     ++cont;
                 }
